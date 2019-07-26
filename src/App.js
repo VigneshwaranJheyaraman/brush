@@ -13,14 +13,6 @@ function App(props) {
   var [brushT, setBrushT] = useState(3);
   useEffect(() => {
     setParentRef(rootRef.current);
-    window.addEventListener("click", ()=> {
-      setMenu({...menu, d:"none"});
-    });
-    return ()=> {
-      window.removeEventListener("click",  () => {
-        setMenu({...menu, d:"none"});
-      });
-    }
   }, [rootRef]);
   return (
     <div onContextMenu={(e) => {e.preventDefault();
@@ -29,7 +21,7 @@ function App(props) {
       menu.y = e.pageY;
       menu.d = "block";
       setMenu(menu);
-    }}>
+    }} onClick = {() => {setMenu({...menu, d:"none"});}}>
       <div className="sideNav">
         <button value="pencil"><i className="fa fa-pencil" onClick = {(e) => {
           setAction(e.target.id);

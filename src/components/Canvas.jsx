@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import CanvasDownloader from './CanvasDownloader';
+import {Switch, Route} from 'react-router-dom'
 class Canvas extends Component
 {
     constructor(props)
@@ -16,6 +18,7 @@ class Canvas extends Component
             brushWidth:0,
             drawColor:"#000",
             colorClicked : false,
+            download:false,
             canvas : null
         };
         this.canvasRef = React.createRef();
@@ -27,6 +30,8 @@ class Canvas extends Component
         this.performDrawing = this.performDrawing.bind(this);
         this.changeColorOfSketch = this.changeColorOfSketch.bind(this);
         this.checkActionChange = this.checkActionChange.bind(this);
+        this.generateScreenshot = this.generateScreenshot.bind(this);
+        this.onComplete = this.onComplete.bind(this);
     }
 
     componentWillMount()
@@ -43,31 +48,37 @@ class Canvas extends Component
 
     checkActionChange()
     {
+        let canvas  = this.state.canvas;
         switch(this.props.action)
         {
             case "pencil":
-                this.state.canvas.style.cursor = "crosshair";
+                canvas.style.cursor = "crosshair";
                 break;
             case "eraser":
-                this.state.canvas.style.cursor = "cell";
+                canvas.style.cursor = "cell";
                 break;
             case "brush":
-                this.state.canvas.style.cursor = "crosshair";
+                canvas.style.cursor = "crosshair";
                 break;
             case "color":
                 this.colorPickerRef.current.click();
                 this.props.changeAction();
                 break;
+            case "save":
+                this.generateScreenshot();
+                this.props.changeAction();
+                break;
             default:
                 break;
         }
+        this.setState({canvas: canvas});
     }
 
-    componentDidUpdate()
+    generateScreenshot()
     {
-        //console.log(this.state.action); //=========================
-        this.checkActionChange();
+        this.setState({download:true});
     }
+
     componentWillUnmount()
     {
         window.removeEventListener("resize", this.resizer, false);
@@ -119,6 +130,7 @@ class Canvas extends Component
         let rect = this.state.canvas.getBoundingClientRect();
         let mouseX = e.clientX - rect.left;
         let mouseY = e.clientY - rect.top;
+        this.checkActionChange();
         this.setState({currMouseX: mouseX, currMouseY: mouseY, prevMouseX: prevX, prevMouseY:prevY,  lineWidth: this.props.pT, eraserWidth: this.props.eT, brushWidth: this.props.bT});
         if(this.state.isDrawing)
         {
@@ -170,12 +182,20 @@ class Canvas extends Component
         this.setState({drawColor : color});
     }
 
+    onComplete()
+    {
+        this.setState({download: false});
+    }
+
     render()
     {
         return (
                 <div>
                     <canvas ref={this.canvasRef} onMouseDown={this.startDrawing} onMouseUp ={this.stopDrawing} onMouseMove = {this.draw}/>
                     <input type="color" ref={this.colorPickerRef} hidden={true} onChange={this.changeColorOfSketch}/>
+                    {
+                        this.state.download?<CanvasDownloader downloadLink={this.state.canvas.toDataURL()} downloadName ={"Canvas_"+new Date().getTime()+".png"} end={this.onComplete}/>:""
+                    }
                 </div>
             );
     }
