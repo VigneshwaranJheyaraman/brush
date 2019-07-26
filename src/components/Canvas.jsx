@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-
 class Canvas extends Component
 {
     constructor(props)
@@ -12,14 +11,22 @@ class Canvas extends Component
             prevMouseY:0,
             currMouseX:0,
             currMouseY:0,
+            eraserWidth : 0,
+            lineWidth:0,
+            brushWidth:0,
+            drawColor:"#000",
+            colorClicked : false,
             canvas : null
         };
         this.canvasRef = React.createRef();
+        this.colorPickerRef = React.createRef();
         this.resizer = this.resizer.bind(this);
         this.startDrawing = this.startDrawing.bind(this);
         this.stopDrawing = this.stopDrawing.bind(this);
         this.draw = this.draw.bind(this);
-        this.performDrawing = this.performDrawing.bind(this); 
+        this.performDrawing = this.performDrawing.bind(this);
+        this.changeColorOfSketch = this.changeColorOfSketch.bind(this);
+        this.checkActionChange = this.checkActionChange.bind(this);
     }
 
     componentWillMount()
@@ -34,9 +41,32 @@ class Canvas extends Component
         });
     }
 
+    checkActionChange()
+    {
+        switch(this.props.action)
+        {
+            case "pencil":
+                this.state.canvas.style.cursor = "crosshair";
+                break;
+            case "eraser":
+                this.state.canvas.style.cursor = "cell";
+                break;
+            case "brush":
+                this.state.canvas.style.cursor = "crosshair";
+                break;
+            case "color":
+                this.colorPickerRef.current.click();
+                this.props.changeAction();
+                break;
+            default:
+                break;
+        }
+    }
+
     componentDidUpdate()
     {
-        //console.log(this.props.action); //=========================
+        //console.log(this.state.action); //=========================
+        this.checkActionChange();
     }
     componentWillUnmount()
     {
@@ -89,7 +119,7 @@ class Canvas extends Component
         let rect = this.state.canvas.getBoundingClientRect();
         let mouseX = e.clientX - rect.left;
         let mouseY = e.clientY - rect.top;
-        this.setState({currMouseX: mouseX, currMouseY: mouseY, prevMouseX: prevX, prevMouseY:prevY});
+        this.setState({currMouseX: mouseX, currMouseY: mouseY, prevMouseX: prevX, prevMouseY:prevY,  lineWidth: this.props.pT, eraserWidth: this.props.eT, brushWidth: this.props.bT});
         if(this.state.isDrawing)
         {
             //console.log("Draggin through "+mouseX+","+mouseY); //=================================
@@ -99,30 +129,54 @@ class Canvas extends Component
 
     performDrawing()
     {
+        let context;
         switch(this.props.action)
         {
             case "pencil":
-                let context = this.state.canvas.getContext("2d");
+                context= this.state.canvas.getContext("2d");
                 context.beginPath();
-                context.strokeStyle="#000";
+                context.strokeStyle=this.state.drawColor;
                 context.moveTo(this.state.prevMouseX,this.state.prevMouseY);
                 context.lineTo(this.state.currMouseX, this.state.currMouseY);
+                context.lineWidth = this.state.lineWidth;
                 context.stroke();
                 context.closePath();
                 break;
             case "eraser":
-                let context = this.state.canvas.getContext();
+                context = this.state.canvas.getContext("2d");
+                context.beginPath();
+                context.clearRect(this.state.currMouseX, this.state.currMouseY, (this.state.eraserWidth),(this.state.eraserWidth));
+                context.closePath();
+                break;
+            case "brush":
+                context = this.state.canvas.getContext("2d");
+                context.beginPath();
+                context.strokeStyle=this.state.drawColor;
+                context.lineWidth = this.state.brushWidth;
+                context.moveTo(this.state.prevMouseX, this.state.prevMouseY);
+                context.lineTo(this.state.currMouseX, this.state.currMouseY);
+                context.stroke();
+                context.closePath();
+                break;
             default : 
                 console.log("Default"); //===============================
                 break;
         }
     }
 
+    changeColorOfSketch(e)
+    {
+        let color = e.target.value;
+        this.setState({drawColor : color});
+    }
 
     render()
     {
         return (
-                <canvas ref={this.canvasRef} onMouseDown={this.startDrawing} onMouseUp ={this.stopDrawing} onMouseMove = {this.draw}/>
+                <div>
+                    <canvas ref={this.canvasRef} onMouseDown={this.startDrawing} onMouseUp ={this.stopDrawing} onMouseMove = {this.draw}/>
+                    <input type="color" ref={this.colorPickerRef} hidden={true} onChange={this.changeColorOfSketch}/>
+                </div>
             );
     }
 }
