@@ -1,33 +1,96 @@
-.App {
+#root, html, body
+{
+  width:100%;
+  height: 100%;
+}
+#root div .sideNav {
+  height: 100%;
+  width: 100px;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+.sideNav button {
   text-align: center;
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 25px;
+  border:0px;
+  border-color: transparent;
+  border-radius: 20%;
+  margin-left: 5px;
+  background-color: transparent;
+  display: block;
 }
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-  pointer-events: none;
+.sideNav button i
+{
+  filter: gray;
+  -webkit-filter: grayscale(1);
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.sideNav button i:hover
+{
+  filter: none;
+  -webkit-filter: grayscale(0);
+  -webkit-transform: scale(1.1);
 }
-
-.App-link {
-  color: #61dafb;
+#root div
+{
+  width:100%;
+  height: 100%;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.brushDiv
+{
+  margin-left: auto;
+  margin-right: auto;
+  background-color: antiquewhite;
+  text-align: center;
+  width: 100%;
+  position: relative;
+  height: 100%;
+}
+#root div .brushDiv canvas
+{
+  background-color: white;
+}
+@media(min-width : 576px)
+{
+  .brushDiv
+  {
+    max-width: 520px; 
   }
-  to {
-    transform: rotate(360deg);
+}
+@media(min-width : 740px)
+{
+  .brushDiv
+  {
+    max-width: 720px; 
   }
+}
+@media(min-width : 992px)
+{
+  .brushDiv
+  {
+    max-width: 960px; 
+  }
+}
+@media(min-width : 1200px)
+{
+  .brushDiv
+  {
+    max-width: 1164px; 
+  }
+}
+@media(min-width : 1600px)
+{
+  .brushDiv
+  {
+    max-width: 1820px; 
+  }
+}
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav button {font-size: 18px;}
 }
