@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import CanvasDownloader from './CanvasDownloader';
-import {Switch, Route} from 'react-router-dom'
 class Canvas extends Component
 {
     constructor(props)
@@ -19,6 +18,8 @@ class Canvas extends Component
             drawColor:"#000",
             colorClicked : false,
             download:false,
+            lastPosX: 0,
+            lastPosY: 0,
             canvas : null
         };
         this.canvasRef = React.createRef();
@@ -69,6 +70,7 @@ class Canvas extends Component
                 this.props.changeAction();
                 break;
             default:
+                canvas.style.cursor = "crosshair";
                 break;
         }
         this.setState({canvas: canvas});
@@ -110,8 +112,13 @@ class Canvas extends Component
 
     startDrawing(e)
     {
-        this.setState({isDrawing : true}, () => {
+        e.persist();
+        let rect = this.state.canvas.getBoundingClientRect();
+        let mx = e.clientX - rect.left;
+        let my = e.clientY - rect.top;
+        this.setState({isDrawing : true, lastPosX: mx, lastPosY:my}, () => {
             //console.log("Drawing Started"+e.which); //=============================
+            //console.log(e.clientX, e.clientY);//=====================================            
         });
     }
 
@@ -167,6 +174,18 @@ class Canvas extends Component
                 context.lineWidth = this.state.brushWidth;
                 context.moveTo(this.state.prevMouseX, this.state.prevMouseY);
                 context.lineTo(this.state.currMouseX, this.state.currMouseY);
+                context.stroke();
+                context.closePath();
+                break;
+            case "square":
+                context = this.state.canvas.getContext("2d");
+                context.beginPath();
+                context.strokeStyle = this.state.drawColor;
+                context.clearRect(0,0,this.state.canvas.width, this.state.canvas.height);
+                let x = (this.state.currMouseX -this.state.lastPosX);
+                let y =( this.state.currMouseY - this.state.lastPosY );
+                //context.clearRect(this.state.lastPosX, this.state.lastPosY, this.state.currMouseX, this.state.currMouseY);
+                context.strokeRect(this.state.lastPosX, this.state.lastPosY, x, y);
                 context.stroke();
                 context.closePath();
                 break;

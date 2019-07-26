@@ -38,6 +38,9 @@ function App(props) {
         <button><i className="fa fa-save" id="save" style = {{color: "green"}} onClick={(e) => {
           setAction(e.target.id);
         }}></i></button>
+        <button><i className="fa fa-square-o" id="square" style = {{color: "blue"}} onClick={(e) => {
+          setAction(e.target.id);
+        }}></i></button>
       </div>
       <div className={props.divClassName} ref={rootRef}>
         <Canvas parentRef={parentRef} action={action} changeAction = {() => {setAction("pencil");}} pT = {penT} eT= {eraseT} bT = {brushT}/>
