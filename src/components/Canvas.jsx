@@ -181,12 +181,15 @@ class Canvas extends Component
                 context = this.state.canvas.getContext("2d");
                 context.beginPath();
                 context.strokeStyle = this.state.drawColor;
-                context.clearRect(0,0,this.state.canvas.width, this.state.canvas.height);
+                //context.clearRect(0,0,this.state.canvas.width, this.state.canvas.height);
                 let x = (this.state.currMouseX -this.state.lastPosX);
                 let y =( this.state.currMouseY - this.state.lastPosY );
-                //context.clearRect(this.state.lastPosX, this.state.lastPosY, this.state.currMouseX, this.state.currMouseY);
-                context.strokeRect(this.state.lastPosX, this.state.lastPosY, x, y);
-                context.stroke();
+                context.clearRect(this.state.lastPosX, this.state.lastPosY-10, this.state.currMouseX, this.state.currMouseY);
+                if(x > 0 && y> 0)
+                {
+                    context.strokeRect(this.state.lastPosX, this.state.lastPosY, x, y);
+                    context.stroke();
+                }
                 context.closePath();
                 break;
             default : 
